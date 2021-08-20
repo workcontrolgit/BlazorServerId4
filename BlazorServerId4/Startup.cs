@@ -40,30 +40,29 @@ namespace BlazorServerId4
                     {
                         options.SignInScheme = CookieAuthenticationDefaults.AuthenticationScheme;
                         options.SignOutScheme = OpenIdConnectDefaults.AuthenticationScheme;
-                        options.Authority = Configuration["oidc:Authority"];
-                        options.ClientId = Configuration["oidc:ClientId"];
-                        options.ClientSecret = Configuration["oidc:ClientSecret"];
-                        
-
+                        // Set Authority to setting in appsettings.json.  This is the URL of the IdentityServer4
+                        options.Authority = Configuration["OIDC:Authority"];
+                        // Set ClientId to setting in appsettings.json.    This Client ID is set when registering the Blazor Server app in IdentityServer4
+                        options.ClientId = Configuration["OIDC:ClientId"];
+                        // Set ClientSecret to setting in appsettings.json.  The secret value is set from the Client >  Basic tab in IdentityServer Admin UI
+                        options.ClientSecret = Configuration["OIDC:ClientSecret"];                
                         // When set to code, the middleware will use PKCE protection
                         options.ResponseType = "code";
-
-                        // The "openid" and "profile" scopes are added automatically,
-                        // so we don't need to add them for this test
-                        //options.Scope.Add("openid");
-                        //options.Scope.Add("profile");
-
-                        // Save the tokens we receive from the IDP
+                        // Add request scopes.  The scopes are set in the Client >  Basic tab in IdentityServer Admin UI
+                        options.Scope.Add("openid");
+                        options.Scope.Add("profile");
+                        options.Scope.Add("email");
+                        options.Scope.Add("roles");
+                        // Save access and refresh tokens to authentication cookie.  the default is false
                         options.SaveTokens = true;
-
                         // It's recommended to always get claims from the 
                         // UserInfoEndpoint during the flow. 
                         options.GetClaimsFromUserInfoEndpoint = true;
-                    options.TokenValidationParameters = new
-                                       TokenValidationParameters
-                    {
-                        NameClaimType = "name"
-                    };
+                        options.TokenValidationParameters = new TokenValidationParameters
+                        {
+                            //map claim to name for display on the upper right corner after login.  Can be name, email, etc.
+                            NameClaimType = "name"
+                        };
 
                     options.Events = new OpenIdConnectEvents
                     {
